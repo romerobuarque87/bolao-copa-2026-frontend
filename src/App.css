@@ -1,0 +1,803 @@
+/* ── Layout ── */
+.page-wrap {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0,156,59,.18) 0%, transparent 70%),
+    var(--cinza-bg);
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--verde-escuro);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+}
+
+.topbar-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: .08em;
+  color: var(--amarelo);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-brand span {
+  color: var(--branco);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+  opacity: .85;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: rgba(255,255,255,.85);
+  font-size: 14px;
+}
+
+/* ── Hero ── */
+.hero {
+  background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--verde) 100%);
+  border-radius: var(--radius);
+  padding: 40px 36px;
+  margin-bottom: 28px;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero::before {
+  content: '⚽';
+  position: absolute;
+  right: -20px;
+  top: -30px;
+  font-size: 160px;
+  opacity: .06;
+  transform: rotate(15deg);
+}
+
+.hero-title {
+  font-size: 52px;
+  color: var(--branco);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.hero-sub {
+  color: var(--amarelo);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.hero-stat {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 12px;
+  padding: 14px 20px;
+  text-align: center;
+  color: var(--branco);
+  min-width: 90px;
+}
+
+.hero-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  line-height: 1;
+  color: var(--amarelo);
+}
+
+.hero-stat-label {
+  font-size: 11px;
+  opacity: .75;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 2px;
+}
+
+/* ── Grid ── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 720px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .hero { flex-direction: column; text-align: center; }
+  .hero-stats { justify-content: center; }
+}
+
+/* ── Card ── */
+.card {
+  background: var(--branco);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--sombra-card);
+  border: 1px solid var(--cinza-borda);
+}
+
+.card-title {
+  font-size: 22px;
+  color: var(--verde-escuro);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 3px solid var(--amarelo);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Perfil ── */
+.perfil-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.perfil-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--texto-leve);
+}
+
+.perfil-row strong {
+  color: var(--texto);
+  min-width: 56px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background: rgba(0,39,118,.1);
+  color: var(--azul);
+}
+
+.badge-user {
+  background: rgba(0,156,59,.1);
+  color: var(--verde-escuro);
+}
+
+/* ── Entrar no Bolão ── */
+.convite-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.convite-form input {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* ── Tabelas ── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--cinza-borda);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead th {
+  background: var(--verde-escuro);
+  color: var(--branco);
+  padding: 12px 14px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+thead th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+
+thead th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+tbody td {
+  padding: 11px 14px;
+  text-align: center;
+  border-bottom: 1px solid var(--cinza-borda);
+  color: var(--texto);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #f6fbf7;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafcfa;
+}
+
+tbody tr:nth-child(even):hover {
+  background: #f0f8f2;
+}
+
+/* ── Ranking posição ── */
+.rank-pos {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+}
+
+.rank-pos.ouro   { color: #c9a800; }
+.rank-pos.prata  { color: #8c9ab0; }
+.rank-pos.bronze { color: #a05c2e; }
+
+/* ── Palpite inputs ── */
+.palpite-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.palpite-wrap input {
+  width: 52px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 4px;
+}
+
+.palpite-vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: var(--texto-leve);
+}
+
+/* ── Resultado ── */
+.resultado {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: .04em;
+  color: var(--verde-escuro);
+}
+
+/* ── Status badges ── */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.tag-ok    { background: rgba(0,156,59,.12); color: #007a2f; }
+.tag-pend  { background: rgba(255,180,0,.12); color: #996600; }
+
+/* ── Pontos obtidos ── */
+.pontos-obtidos {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--verde-escuro);
+}
+
+/* ── Selector bolão ── */
+.selector-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.selector-wrap label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-leve);
+  white-space: nowrap;
+}
+
+/* ── Inputs & Selects ── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid var(--cinza-borda);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  color: var(--texto);
+  background: var(--branco);
+  outline: none;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px rgba(0,156,59,.15);
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .18s, transform .1s, box-shadow .18s;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(.97);
+}
+
+.btn-primary {
+  background: var(--verde);
+  color: var(--branco);
+  box-shadow: 0 2px 8px rgba(0,156,59,.35);
+}
+
+.btn-primary:hover {
+  background: var(--verde-hover);
+  box-shadow: 0 4px 14px rgba(0,156,59,.45);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--verde-escuro);
+  border: 1.5px solid var(--verde);
+}
+
+.btn-secondary:hover {
+  background: rgba(0,156,59,.07);
+}
+
+.btn-danger {
+  background: transparent;
+  color: #c0392b;
+  border: 1.5px solid #e57373;
+}
+
+.btn-danger:hover {
+  background: rgba(192,57,43,.07);
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+/* ── Mensagens ── */
+.alerta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.alerta-erro {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+.alerta-ok {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+/* ── Vazio ── */
+.empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--texto-leve);
+  font-size: 14px;
+}
+
+.empty-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+/* ══════════════════════════════
+   LOGIN PAGE
+══════════════════════════════ */
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(145deg, var(--verde-escuro) 0%, var(--verde) 60%, #00b347 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(255,223,0,.12) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0,39,118,.2) 0%, transparent 50%);
+}
+
+.login-deco {
+  position: absolute;
+  font-size: 220px;
+  opacity: .04;
+  right: -30px;
+  bottom: -30px;
+  transform: rotate(-10deg);
+  user-select: none;
+}
+
+.login-box {
+  background: var(--branco);
+  border-radius: 24px;
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.3);
+  position: relative;
+  z-index: 1;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-logo h1 {
+  font-size: 40px;
+  color: var(--verde-escuro);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.login-logo p {
+  font-size: 13px;
+  color: var(--texto-leve);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-leve);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  width: 100%;
+  height: 46px;
+  font-size: 15px;
+}
+
+.login-form .btn-primary {
+  height: 48px;
+  font-size: 16px;
+  margin-top: 4px;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--texto-leve);
+  opacity: .7;
+}
+/* ── Jogos por Grupo ── */
+.grupos-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grupo-card {
+  border: 1px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fbfdfb;
+}
+
+.grupo-header {
+  background: var(--verde-escuro);
+  color: var(--branco);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grupo-header span {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.grupo-header small {
+  color: var(--amarelo);
+  font-weight: 700;
+}
+
+.grupo-jogos {
+  display: flex;
+  flex-direction: column;
+}
+
+.jogo-card {
+  display: grid;
+  grid-template-columns: 1fr 110px 170px 90px;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--cinza-borda);
+  background: var(--branco);
+}
+
+.jogo-card:last-child {
+  border-bottom: none;
+}
+
+.jogo-card:hover {
+  background: #f6fbf7;
+}
+
+.jogo-data {
+  font-size: 13px;
+  color: var(--texto-leve);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.jogo-times {
+  display: grid;
+  grid-template-columns: 1fr 24px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.time-visitante {
+  justify-content: flex-start;
+}
+
+.bandeira {
+  width: 34px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--cinza-borda);
+  background: #fff;
+}
+
+.versus {
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: var(--verde-escuro);
+}
+
+.jogo-meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--texto-leve);
+}
+
+.jogo-resultado,
+.jogo-palpite,
+.jogo-acao {
+  text-align: center;
+}
+
+.label-mini {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--texto-leve);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.pontos-mini {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--verde-escuro);
+}
+
+.enviado-texto {
+  color: #009c3b;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .jogo-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .jogo-times {
+    grid-template-columns: 1fr;
+  }
+
+  .versus {
+    display: none;
+  }
+
+  .time {
+    justify-content: center;
+  }
+
+  .jogo-meta {
+    justify-content: center;
+  }
+}
+/* =========================================
+   MATA-MATA
+========================================= */
+
+.fase-mata-mata {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(0,156,59,.1);
+  color: var(--verde-escuro);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.classificado-wrap {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.classificado-wrap label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--texto-leve);
+  font-weight: 700;
+}
+
+.classificado-wrap select {
+  height: 34px;
+  font-size: 12px;
+  padding: 0 8px;
+}
+
+.penaltis-mini {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--texto-leve);
+}
+
+/* =========================================
+   AJUSTE DAS BANDEIRAS
+========================================= */
+
+.jogo-times {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  align-items: center;
+  gap: 18px;
+}
+
+.time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.time-casa {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.time-visitante {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.versus {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--verde-escuro);
+}
