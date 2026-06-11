@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import '../App.css'
 
@@ -74,6 +74,10 @@ function Login() {
             {loading ? 'Entrando…' : '⚡ Entrar'}
           </button>
         </form>
+
+        <p className="login-footer">
+          Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
+        </p>
 
         <p className="login-footer">Bolão Copa do Mundo 2026</p>
       </div>
