@@ -19,7 +19,9 @@ function Dashboard() {
 
   const navigate = useNavigate()
 
-  useEffect(() => { carregarDados() }, [])
+  useEffect(() => {
+    carregarDados()
+  }, [])
 
   useEffect(() => {
     if (bolaoSelecionadoId) {
@@ -50,7 +52,7 @@ function Dashboard() {
       setJogosPorGrupo(jogosAgrupados)
       setJogos(Object.values(jogosAgrupados).flat())
 
-      if (boloesResponse.data.length > 0) {
+      if (boloesResponse.data.length > 0 && !bolaoSelecionadoId) {
         setBolaoSelecionadoId(String(boloesResponse.data[0].id))
       }
     } catch {
@@ -83,6 +85,7 @@ function Dashboard() {
     try {
       const bolaoSelecionado = boloes.find((b) => String(b.id) === String(participanteBolaoId))
       if (!bolaoSelecionado) return
+
       const response = await api.get(`/ranking/bolao/${bolaoSelecionado.bolaoId}`)
       setRanking(response.data)
     } catch {
@@ -196,7 +199,6 @@ function Dashboard() {
 
     try {
       await api.put(`/palpites/enviar/${bolaoSelecionadoId}`)
-
       setMensagem('Palpites enviados com sucesso! Agora eles estão bloqueados.')
       await carregarDados()
       await carregarPalpitesDoBolao(bolaoSelecionadoId)
@@ -333,6 +335,7 @@ function Dashboard() {
     return 'rank-pos'
   }
 
+  const ehAdmin = usuario?.administrador === true
   const meuBolao = boloes.find((b) => String(b.id) === String(bolaoSelecionadoId))
   const meuRanking = ranking.find((r) => r.nomeUsuario === usuario?.nome)
   const palpitesJaEnviados = meuBolao?.palpitesEnviados === true
@@ -361,7 +364,7 @@ function Dashboard() {
           <div className="hero-stats">
             <div className="hero-stat">
               <div className="hero-stat-num">{boloes.length}</div>
-              <div className="hero-stat-label">Bolões</div>
+              <div className="hero-stat-label">{ehAdmin ? 'Bolões' : 'Meus bolões'}</div>
             </div>
             <div className="hero-stat">
               <div className="hero-stat-num">{jogos.length}</div>
@@ -385,32 +388,32 @@ function Dashboard() {
                 <div className="perfil-row"><strong>E-mail</strong> {usuario.email}</div>
                 <div className="perfil-row">
                   <strong>Perfil</strong>
-                  <span className={`badge ${usuario.administrador ? 'badge-admin' : 'badge-user'}`}>
-                    {usuario.administrador ? '🛡 Administrador' : '⚽ Participante'}
+                  <span className={`badge ${ehAdmin ? 'badge-admin' : 'badge-user'}`}>
+                    {ehAdmin ? '🛡 Administrador' : '⚽ Participante'}
                   </span>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="card">
-            <div className="card-title">🎟 Entrar em um Bolão</div>
-            <form onSubmit={entrarNoBolao} className="convite-form">
-              <input
-                type="text"
-                value={codigoConvite}
-                onChange={(e) => setCodigoConvite(e.target.value)}
-                placeholder="Cole o código do convite"
-                style={{ flex: 1 }}
-              />
-              <button type="submit" className="btn btn-primary">Entrar</button>
-            </form>
-          </div>
-        </div>
+          {!ehAdmin && (
+            <div className="card">
+              <div className="card-title">🎟 Entrar em um Bolão</div>
+              <form onSubmit={entrarNoBolao} className="convite-form">
+                <input
+                  type="text"
+                  value={codigoConvite}
+                  onChange={(e) => setCodigoConvite(e.target.value)}
+                  placeholder="Cole o código do convite"
+                  style={{ flex: 1 }}
+                />
+                <button type="submit" className="btn btn-primary">Entrar</button>
+              </form>
+            </div>
+          )}
 
-        {usuario?.administrador && (
-          <>
-            <div className="card" style={{ marginBottom: 20 }}>
+          {ehAdmin && (
+            <div className="card">
               <div className="card-title">🛠 Criar Bolão</div>
               <form onSubmit={criarBolao} className="convite-form">
                 <input
@@ -423,27 +426,36 @@ function Dashboard() {
                 <button type="submit" className="btn btn-primary">Criar Bolão</button>
               </form>
             </div>
+          )}
+        </div>
 
-            <div className="card" style={{ marginBottom: 20 }}>
-              <div className="card-title">🧩 Administração do Mata-Mata</div>
-              <div className="selector-wrap">
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-dezesseis-avos', '16 avos')}>Gerar 16 avos</button>
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-oitavas', 'oitavas')}>Gerar oitavas</button>
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-quartas', 'quartas')}>Gerar quartas</button>
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-semifinal', 'semifinal')}>Gerar semifinal</button>
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-terceiro-lugar', 'terceiro lugar')}>Gerar 3º lugar</button>
-                <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-final', 'final')}>Gerar final</button>
-              </div>
+        {ehAdmin && (
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div className="card-title">🧩 Administração do Mata-Mata</div>
+            <div className="selector-wrap">
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-dezesseis-avos', '16 avos')}>Gerar 16 avos</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-oitavas', 'oitavas')}>Gerar oitavas</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-quartas', 'quartas')}>Gerar quartas</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-semifinal', 'semifinal')}>Gerar semifinal</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-terceiro-lugar', 'terceiro lugar')}>Gerar 3º lugar</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-final', 'final')}>Gerar final</button>
             </div>
-          </>
+          </div>
         )}
 
         <div className="card" style={{ marginBottom: 20 }}>
-          <div className="card-title">🏆 Meus Bolões</div>
+          <div className="card-title">
+            {ehAdmin ? '🏆 Administração de Bolões' : '🏆 Meus Bolões'}
+          </div>
+
           {boloes.length === 0 ? (
             <div className="empty">
               <div className="empty-icon">⚽</div>
-              <p>Você ainda não participa de nenhum bolão.<br />Use o código de convite acima!</p>
+              <p>
+                {ehAdmin
+                  ? 'Você ainda não criou ou participa de nenhum bolão.'
+                  : 'Você ainda não participa de nenhum bolão. Use o código de convite acima!'}
+              </p>
             </div>
           ) : (
             <div className="table-wrap">
@@ -480,7 +492,10 @@ function Dashboard() {
         </div>
 
         <div className="card" style={{ marginBottom: 20 }}>
-          <div className="card-title">📊 Ranking do Bolão</div>
+          <div className="card-title">
+            {ehAdmin ? '📊 Ranking e Participantes' : '📊 Ranking do Bolão'}
+          </div>
+
           <div className="selector-wrap" style={{ marginBottom: 18 }}>
             <label>Bolão selecionado:</label>
             <select value={bolaoSelecionadoId} onChange={(e) => setBolaoSelecionadoId(e.target.value)}>
@@ -490,7 +505,7 @@ function Dashboard() {
               ))}
             </select>
 
-            {bolaoSelecionadoId && (
+            {!ehAdmin && bolaoSelecionadoId && (
               <button
                 type="button"
                 className="btn btn-primary"
@@ -521,7 +536,11 @@ function Dashboard() {
                 <tbody>
                   {ranking.map((item) => (
                     <tr key={item.participanteBolaoId}>
-                      <td><span className={rankClass(item.posicao)}>{item.posicao === 1 ? '🥇' : item.posicao === 2 ? '🥈' : item.posicao === 3 ? '🥉' : `${item.posicao}º`}</span></td>
+                      <td>
+                        <span className={rankClass(item.posicao)}>
+                          {item.posicao === 1 ? '🥇' : item.posicao === 2 ? '🥈' : item.posicao === 3 ? '🥉' : `${item.posicao}º`}
+                        </span>
+                      </td>
                       <td>{item.nomeUsuario}</td>
                       <td className="pontos-obtidos">{item.pontos}</td>
                     </tr>
@@ -533,7 +552,9 @@ function Dashboard() {
         </div>
 
         <div className="card">
-          <div className="card-title">⚽ Jogos da Copa — Seus Palpites</div>
+          <div className="card-title">
+            {ehAdmin ? '⚽ Administração de Jogos e Resultados' : '⚽ Meus Palpites'}
+          </div>
 
           {jogos.length === 0 ? (
             <div className="empty">
@@ -594,51 +615,95 @@ function Dashboard() {
                           )}
                         </div>
 
-                        <div className="jogo-palpite">
-                          <div className="label-mini">Seu palpite</div>
+                        {!ehAdmin && (
+                          <div className="jogo-palpite">
+                            <div className="label-mini">Seu palpite</div>
 
-                          <div className="palpite-wrap">
-                            <input type="number" min="0" value={palpites[jogo.id]?.golsCasa ?? ''} onChange={(e) => atualizarPalpite(jogo.id, 'golsCasa', e.target.value)} disabled={jogo.finalizado || palpitesJaEnviados} />
-                            <span className="palpite-vs">×</span>
-                            <input type="number" min="0" value={palpites[jogo.id]?.golsVisitante ?? ''} onChange={(e) => atualizarPalpite(jogo.id, 'golsVisitante', e.target.value)} disabled={jogo.finalizado || palpitesJaEnviados} />
-                          </div>
-
-                          {ehMataMata(jogo) && (
-                            <div className="classificado-wrap">
-                              <label>Quem passa?</label>
-                              <select value={palpites[jogo.id]?.classificadoPalpiteId ?? ''} onChange={(e) => atualizarPalpite(jogo.id, 'classificadoPalpiteId', e.target.value)} disabled={jogo.finalizado || palpitesJaEnviados}>
-                                <option value="">Selecione</option>
-                                <option value={jogo.timeCasaId}>{jogo.timeCasaNome}</option>
-                                <option value={jogo.timeVisitanteId}>{jogo.timeVisitanteNome}</option>
-                              </select>
+                            <div className="palpite-wrap">
+                              <input
+                                type="number"
+                                min="0"
+                                value={palpites[jogo.id]?.golsCasa ?? ''}
+                                onChange={(e) => atualizarPalpite(jogo.id, 'golsCasa', e.target.value)}
+                                disabled={jogo.finalizado || palpitesJaEnviados}
+                              />
+                              <span className="palpite-vs">×</span>
+                              <input
+                                type="number"
+                                min="0"
+                                value={palpites[jogo.id]?.golsVisitante ?? ''}
+                                onChange={(e) => atualizarPalpite(jogo.id, 'golsVisitante', e.target.value)}
+                                disabled={jogo.finalizado || palpitesJaEnviados}
+                              />
                             </div>
-                          )}
 
-                          <div className="pontos-mini">
-                            Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : '—'}
+                            {ehMataMata(jogo) && (
+                              <div className="classificado-wrap">
+                                <label>Quem passa?</label>
+                                <select
+                                  value={palpites[jogo.id]?.classificadoPalpiteId ?? ''}
+                                  onChange={(e) => atualizarPalpite(jogo.id, 'classificadoPalpiteId', e.target.value)}
+                                  disabled={jogo.finalizado || palpitesJaEnviados}
+                                >
+                                  <option value="">Selecione</option>
+                                  <option value={jogo.timeCasaId}>{jogo.timeCasaNome}</option>
+                                  <option value={jogo.timeVisitanteId}>{jogo.timeVisitanteNome}</option>
+                                </select>
+                              </div>
+                            )}
+
+                            <div className="pontos-mini">
+                              Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : '—'}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         <div className="jogo-acao">
-                          {!jogo.finalizado && !palpitesJaEnviados && (
+                          {!ehAdmin && !jogo.finalizado && !palpitesJaEnviados && (
                             <button className="btn btn-primary btn-sm" onClick={() => salvarPalpite(jogo)}>Salvar</button>
                           )}
 
-                          {palpitesJaEnviados && <span className="enviado-texto">✓ Enviado</span>}
+                          {!ehAdmin && palpitesJaEnviados && <span className="enviado-texto">✓ Enviado</span>}
 
-                          {usuario?.administrador && (
+                          {ehAdmin && (
                             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              <div className="label-mini">Resultado real</div>
+
                               <div className="palpite-wrap">
-                                <input type="number" min="0" placeholder="Casa" value={resultadosAdmin[jogo.id]?.golsCasa ?? ''} onChange={(e) => atualizarResultadoAdmin(jogo.id, 'golsCasa', e.target.value)} />
+                                <input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Casa"
+                                  value={resultadosAdmin[jogo.id]?.golsCasa ?? ''}
+                                  onChange={(e) => atualizarResultadoAdmin(jogo.id, 'golsCasa', e.target.value)}
+                                />
                                 <span className="palpite-vs">×</span>
-                                <input type="number" min="0" placeholder="Visit." value={resultadosAdmin[jogo.id]?.golsVisitante ?? ''} onChange={(e) => atualizarResultadoAdmin(jogo.id, 'golsVisitante', e.target.value)} />
+                                <input
+                                  type="number"
+                                  min="0"
+                                  placeholder="Visit."
+                                  value={resultadosAdmin[jogo.id]?.golsVisitante ?? ''}
+                                  onChange={(e) => atualizarResultadoAdmin(jogo.id, 'golsVisitante', e.target.value)}
+                                />
                               </div>
 
                               {ehMataMata(jogo) && (
                                 <div className="palpite-wrap">
-                                  <input type="number" min="0" placeholder="Pên C" value={resultadosAdmin[jogo.id]?.penaltisCasa ?? ''} onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisCasa', e.target.value)} />
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    placeholder="Pên C"
+                                    value={resultadosAdmin[jogo.id]?.penaltisCasa ?? ''}
+                                    onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisCasa', e.target.value)}
+                                  />
                                   <span className="palpite-vs">×</span>
-                                  <input type="number" min="0" placeholder="Pên V" value={resultadosAdmin[jogo.id]?.penaltisVisitante ?? ''} onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisVisitante', e.target.value)} />
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    placeholder="Pên V"
+                                    value={resultadosAdmin[jogo.id]?.penaltisVisitante ?? ''}
+                                    onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisVisitante', e.target.value)}
+                                  />
                                 </div>
                               )}
 
