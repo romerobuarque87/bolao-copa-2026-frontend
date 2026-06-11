@@ -9,6 +9,7 @@ function Dashboard() {
   const [jogos, setJogos] = useState([])
   const [jogosPorGrupo, setJogosPorGrupo] = useState({})
   const [ranking, setRanking] = useState([])
+  const [participantesPorBolao, setParticipantesPorBolao] = useState({})
   const [bolaoSelecionadoId, setBolaoSelecionadoId] = useState('')
   const [palpites, setPalpites] = useState({})
   const [resultadosAdmin, setResultadosAdmin] = useState({})
@@ -36,7 +37,10 @@ function Dashboard() {
       setUsuario(usuarioResponse.data)
 
       const boloesResponse = await api.get(`/boloes/usuario/${usuarioResponse.data.id}`)
-      setBoloes(boloesResponse.data)
+      const boloesCarregados = boloesResponse.data || []
+      setBoloes(boloesCarregados)
+
+      await carregarQuantidadeParticipantes(boloesCarregados)
 
       const gruposResponse = await api.get('/jogos/grupos')
       const jogosAgrupados = gruposResponse.data || {}
@@ -52,8 +56,8 @@ function Dashboard() {
       setJogosPorGrupo(jogosAgrupados)
       setJogos(Object.values(jogosAgrupados).flat())
 
-      if (boloesResponse.data.length > 0 && !bolaoSelecionadoId) {
-        setBolaoSelecionadoId(String(boloesResponse.data[0].id))
+      if (boloesCarregados.length > 0 && !bolaoSelecionadoId) {
+        setBolaoSelecionadoId(String(boloesCarregados[0].id))
       }
     } catch {
       setErro('Erro ao carregar dados')
@@ -90,6 +94,32 @@ function Dashboard() {
       setRanking(response.data)
     } catch {
       setErro('Erro ao carregar ranking')
+    }
+  }
+
+  async function carregarQuantidadeParticipantes(boloesCarregados) {
+    try {
+      const contagens = {}
+
+      await Promise.all(
+        boloesCarregados.map(async (bolao) => {
+          if (!bolao.bolaoId) {
+            contagens[bolao.id] = 0
+            return
+          }
+
+          try {
+            const response = await api.get(`/ranking/bolao/${bolao.bolaoId}`)
+            contagens[bolao.id] = response.data?.length || 0
+          } catch {
+            contagens[bolao.id] = 0
+          }
+        })
+      )
+
+      setParticipantesPorBolao(contagens)
+    } catch {
+      setParticipantesPorBolao({})
     }
   }
 
@@ -301,6 +331,23 @@ function Dashboard() {
     }
   }
 
+  async function copiarCodigoConvite(codigo) {
+    setErro('')
+    setMensagem('')
+
+    if (!codigo) {
+      setErro('Este bolão ainda não possui código de convite.')
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(codigo)
+      setMensagem(`Código ${codigo} copiado! Agora é só enviar para os participantes.`)
+    } catch {
+      setErro('Não foi possível copiar automaticamente. Selecione o código e copie manualmente.')
+    }
+  }
+
   function sair() {
     localStorage.removeItem('token')
     navigate('/login')
@@ -464,8 +511,10 @@ function Dashboard() {
                   <tr>
                     <th>Bolão</th>
                     <th>Código</th>
+                    <th>Participantes</th>
                     <th>Pontos</th>
                     <th>Palpites</th>
+                    <th>Ação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -477,11 +526,23 @@ function Dashboard() {
                           {bolao.codigoConvite}
                         </code>
                       </td>
+                      <td style={{ fontWeight: 700, color: 'var(--verde-escuro)' }}>
+                        {participantesPorBolao[bolao.id] ?? 0}
+                      </td>
                       <td style={{ fontWeight: 700, color: 'var(--verde-escuro)' }}>{bolao.pontos}</td>
                       <td>
                         <span className={`tag ${bolao.palpitesEnviados ? 'tag-ok' : 'tag-pend'}`}>
                           {bolao.palpitesEnviados ? '✓ Enviados' : '⏳ Pendentes'}
                         </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm"
+                          onClick={() => copiarCodigoConvite(bolao.codigoConvite)}
+                        >
+                          Copiar código
+                        </button>
                       </td>
                     </tr>
                   ))}
