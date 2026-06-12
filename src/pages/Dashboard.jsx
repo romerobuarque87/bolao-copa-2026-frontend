@@ -17,6 +17,8 @@ function Dashboard() {
   const [nomeNovoBolao, setNomeNovoBolao] = useState('')
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
+  const [palpitesParticipantes, setPalpitesParticipantes] = useState([])
+  const [participanteAberto, setParticipanteAberto] = useState('')
 
   const navigate = useNavigate()
 
@@ -25,44 +27,70 @@ function Dashboard() {
   }, [])
 
   useEffect(() => {
-    if (bolaoSelecionadoId) {
+  if (bolaoSelecionadoId && usuario) {
+    if (ehAdmin) {
+      carregarRankingDoBolaoSelecionado(bolaoSelecionadoId)
+    } else {
       carregarPalpitesDoBolao(bolaoSelecionadoId)
       carregarRankingDoBolaoSelecionado(bolaoSelecionadoId)
     }
-  }, [bolaoSelecionadoId, boloes])
+  }
+}, [bolaoSelecionadoId, boloes, usuario])
 
   async function carregarDados() {
-    try {
-      const usuarioResponse = await api.get('/auth/me')
-      setUsuario(usuarioResponse.data)
+  try {
+    const usuarioResponse = await api.get('/auth/me')
+    const usuarioLogado = usuarioResponse.data
+    setUsuario(usuarioLogado)
 
-      const boloesResponse = await api.get(`/boloes/usuario/${usuarioResponse.data.id}`)
-      const boloesCarregados = boloesResponse.data || []
-      setBoloes(boloesCarregados)
+    const admin = usuarioLogado.administrador === true
 
-      await carregarQuantidadeParticipantes(boloesCarregados)
+    let boloesCarregados = []
 
-      const gruposResponse = await api.get('/jogos/grupos')
-      const jogosAgrupados = gruposResponse.data || {}
+    if (admin) {
+      const boloesResponse = await api.get('/boloes')
 
-      const jogosResponse = await api.get('/jogos')
-      const todosJogos = jogosResponse.data || []
-      const mataMata = todosJogos.filter((jogo) => jogo.fase !== 'GRUPOS')
-
-      if (mataMata.length > 0) {
-        jogosAgrupados['MATA-MATA'] = mataMata
-      }
-
-      setJogosPorGrupo(jogosAgrupados)
-      setJogos(Object.values(jogosAgrupados).flat())
-
-      if (boloesCarregados.length > 0 && !bolaoSelecionadoId) {
-        setBolaoSelecionadoId(String(boloesCarregados[0].id))
-      }
-    } catch {
-      setErro('Erro ao carregar dados')
+      boloesCarregados = (boloesResponse.data || []).map((bolao) => ({
+        id: bolao.id,
+        bolaoId: bolao.id,
+        nomeBolao: bolao.nome,
+        codigoConvite: bolao.codigoConvite,
+        pontos: 0,
+        palpitesEnviados: false,
+      }))
+    } else {
+      const boloesResponse = await api.get(`/boloes/usuario/${usuarioLogado.id}`)
+      boloesCarregados = boloesResponse.data || []
     }
+
+    setBoloes(boloesCarregados)
+
+    await carregarQuantidadeParticipantes(boloesCarregados)
+
+    const gruposResponse = await api.get('/jogos/grupos')
+    const jogosAgrupados = gruposResponse.data || {}
+
+    const jogosResponse = await api.get('/jogos')
+    const todosJogos = jogosResponse.data || []
+    const mataMata = todosJogos.filter((jogo) => jogo.fase !== 'GRUPOS')
+
+    if (mataMata.length > 0) {
+      jogosAgrupados['MATA-MATA'] = mataMata
+    }
+
+    setJogosPorGrupo(jogosAgrupados)
+    setJogos(Object.values(jogosAgrupados).flat())
+
+    if (boloesCarregados.length > 0) {
+      setBolaoSelecionadoId(String(boloesCarregados[0].id))
+    } else {
+      setBolaoSelecionadoId('')
+      setRanking([])
+    }
+    } catch {
+    setErro('Erro ao carregar dados')
   }
+}
 
   async function carregarPalpitesDoBolao(participanteBolaoId) {
     try {
@@ -348,6 +376,37 @@ function Dashboard() {
     }
   }
 
+  async function carregarPalpitesParticipantes() {
+  setErro('')
+  setMensagem('')
+
+  if (!meuBolao) {
+    setErro('Selecione um bolão primeiro.')
+    return
+  }
+
+  if (!ehAdmin && !palpitesJaEnviados) {
+    setErro('Você só pode ver os palpites dos outros participantes depois de enviar os seus.')
+    return
+  }
+
+  try {
+    const response = await api.get(
+      `/palpites/bolao/${meuBolao.bolaoId}/participante/${meuBolao.id}/enviados`
+    )
+
+    setPalpitesParticipantes(response.data || [])
+    setMensagem('Palpites dos participantes carregados com sucesso.')
+  } catch (error) {
+    setErro(
+      error.response?.data?.message ||
+      error.response?.data?.erro ||
+      error.response?.data ||
+      'Erro ao carregar palpites dos participantes.'
+    )
+  }
+}
+
   function sair() {
     localStorage.removeItem('token')
     navigate('/login')
@@ -500,7 +559,7 @@ function Dashboard() {
               <div className="empty-icon">⚽</div>
               <p>
                 {ehAdmin
-                  ? 'Você ainda não criou ou participa de nenhum bolão.'
+                  ? 'Nenhum bolão cadastrado ainda.'
                   : 'Você ainda não participa de nenhum bolão. Use o código de convite acima!'}
               </p>
             </div>
@@ -611,6 +670,120 @@ function Dashboard() {
             </div>
           )}
         </div>
+        <div className="card" style={{ marginBottom: 20 }}>
+  <div className="card-title">👀 Palpites dos Participantes</div>
+
+  <div style={{ marginBottom: 15 }}>
+    <button
+      type="button"
+      className="btn btn-primary"
+      onClick={carregarPalpitesParticipantes}
+      disabled={!ehAdmin && !palpitesJaEnviados}
+    >
+      Ver palpites enviados
+    </button>
+  </div>
+
+  {!ehAdmin && !palpitesJaEnviados && (
+    <div className="empty">
+      <div className="empty-icon">🔒</div>
+      <p>Você só poderá ver os palpites dos outros participantes depois de enviar os seus.</p>
+    </div>
+  )}
+
+  {palpitesParticipantes.length > 0 && (
+  <>
+    {Array.from(new Set(palpitesParticipantes.map((p) => p.nomeUsuario || 'Sem nome')))
+      .map((nomeUsuario) => {
+
+        const palpitesDoParticipante =
+          palpitesParticipantes.filter(
+            p => p.nomeUsuario === nomeUsuario
+          )
+
+        const aberto = participanteAberto === nomeUsuario
+
+        return (
+          <div
+            key={nomeUsuario}
+            style={{
+              border: '1px solid #ddd',
+              borderRadius: 8,
+              padding: 12,
+              marginBottom: 12
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}
+            >
+              <strong>👤 {nomeUsuario}</strong>
+
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() =>
+                  setParticipanteAberto(
+                    aberto ? '' : nomeUsuario
+                  )
+                }
+              >
+                {aberto ? 'Ocultar' : 'Ver palpites'}
+              </button>
+            </div>
+
+            {aberto && (
+              <div
+                className="table-wrap"
+                style={{ marginTop: 15 }}
+              >
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Jogo</th>
+                      <th>Fase</th>
+                      <th>Palpite</th>
+                      <th>Classificado</th>
+                      <th>Pontos</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {palpitesDoParticipante.map((p) => (
+                      <tr key={p.id}>
+                        <td>
+                          {p.timeCasaNome} x {p.timeVisitanteNome}
+                        </td>
+
+                        <td>
+                          {formatarFase(p.fase)}
+                        </td>
+
+                        <td>
+                          {p.golsCasaPalpite} x {p.golsVisitantePalpite}
+                        </td>
+
+                        <td>
+                          {p.classificadoPalpiteNome || '-'}
+                        </td>
+
+                        <td className="pontos-obtidos">
+                          {p.pontosObtidos}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )
+      })}
+  </>
+)}
+</div>
 
         <div className="card">
           <div className="card-title">
