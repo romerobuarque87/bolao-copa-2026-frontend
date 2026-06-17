@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dumps de banco / dados sensíveis (NÃO versionar — contêm PII)
+*.sql
+
+# Mock de design (descartável)
+mock-palpites.html
