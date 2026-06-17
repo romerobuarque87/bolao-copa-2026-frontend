@@ -18,7 +18,7 @@ function Dashboard() {
   const [erro, setErro] = useState('')
   const [mensagem, setMensagem] = useState('')
   const [palpitesParticipantes, setPalpitesParticipantes] = useState([])
-  const [participanteAberto, setParticipanteAberto] = useState('')
+  const [jogoAberto, setJogoAberto] = useState('')
 
   const navigate = useNavigate()
 
@@ -441,10 +441,65 @@ function Dashboard() {
     return 'rank-pos'
   }
 
+  function chipClass(pts) {
+    if (pts >= 10) return 'pp-chip pp-p10'
+    if (pts >= 7) return 'pp-chip pp-p7'
+    if (pts >= 5) return 'pp-chip pp-p5'
+    if (pts >= 2) return 'pp-chip pp-p2'
+    return 'pp-chip pp-p0'
+  }
+
+  function acertoLabel(jogo, palpite) {
+    const exato =
+      palpite.golsCasaPalpite === jogo.golsCasa &&
+      palpite.golsVisitantePalpite === jogo.golsVisitante
+    if (exato) return '🎯 Placar exato'
+
+    const sinal = (a, b) => Math.sign(a - b)
+    const acertouResultado =
+      sinal(jogo.golsCasa, jogo.golsVisitante) ===
+      sinal(palpite.golsCasaPalpite, palpite.golsVisitantePalpite)
+    const acertouGol =
+      palpite.golsCasaPalpite === jogo.golsCasa ||
+      palpite.golsVisitantePalpite === jogo.golsVisitante
+
+    const partes = []
+    if (acertouResultado) partes.push('✅ Resultado')
+    if (acertouGol) partes.push('🟡 Gol exato')
+    return partes.join(' + ') || '—'
+  }
+
+  function statsJogo(palpitesDoJogo) {
+    let exato = 0
+    let resultado = 0
+    let melhor = null
+    palpitesDoJogo.forEach((p) => {
+      const pts = p.pontosObtidos ?? 0
+      if (pts >= 10) exato++
+      if (pts >= 5) resultado++
+      if (!melhor || pts > (melhor.pontosObtidos ?? 0)) melhor = p
+    })
+    return { exato, resultado, melhor }
+  }
+
+  function ordenarPalpites(lista) {
+    return [...lista].sort(
+      (a, b) =>
+        (b.pontosObtidos ?? 0) - (a.pontosObtidos ?? 0) ||
+        (a.nomeUsuario || '').localeCompare(b.nomeUsuario || '')
+    )
+  }
+
   const ehAdmin = usuario?.administrador === true
   const meuBolao = boloes.find((b) => String(b.id) === String(bolaoSelecionadoId))
   const meuRanking = ranking.find((r) => r.nomeUsuario === usuario?.nome)
   const palpitesJaEnviados = meuBolao?.palpitesEnviados === true
+
+  const palpitesPorJogo = {}
+  palpitesParticipantes.forEach((p) => {
+    if (!palpitesPorJogo[p.jogoId]) palpitesPorJogo[p.jogoId] = []
+    palpitesPorJogo[p.jogoId].push(p)
+  })
 
   return (
     <div className="page-wrap">
@@ -671,119 +726,136 @@ function Dashboard() {
           )}
         </div>
         <div className="card" style={{ marginBottom: 20 }}>
-  <div className="card-title">👀 Palpites dos Participantes</div>
+          <div className="card-title">👀 Palpites dos Participantes</div>
 
-  <div style={{ marginBottom: 15 }}>
-    <button
-      type="button"
-      className="btn btn-primary"
-      onClick={carregarPalpitesParticipantes}
-      disabled={!ehAdmin && !palpitesJaEnviados}
-    >
-      Ver palpites enviados
-    </button>
-  </div>
-
-  {!ehAdmin && !palpitesJaEnviados && (
-    <div className="empty">
-      <div className="empty-icon">🔒</div>
-      <p>Você só poderá ver os palpites dos outros participantes depois de enviar os seus.</p>
-    </div>
-  )}
-
-  {palpitesParticipantes.length > 0 && (
-  <>
-    {Array.from(new Set(palpitesParticipantes.map((p) => p.nomeUsuario || 'Sem nome')))
-      .map((nomeUsuario) => {
-
-        const palpitesDoParticipante =
-          palpitesParticipantes.filter(
-            p => p.nomeUsuario === nomeUsuario
-          )
-
-        const aberto = participanteAberto === nomeUsuario
-
-        return (
-          <div
-            key={nomeUsuario}
-            style={{
-              border: '1px solid #ddd',
-              borderRadius: 8,
-              padding: 12,
-              marginBottom: 12
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
+          <div style={{ marginBottom: 15 }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={carregarPalpitesParticipantes}
+              disabled={!ehAdmin && !palpitesJaEnviados}
             >
-              <strong>👤 {nomeUsuario}</strong>
-
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() =>
-                  setParticipanteAberto(
-                    aberto ? '' : nomeUsuario
-                  )
-                }
-              >
-                {aberto ? 'Ocultar' : 'Ver palpites'}
-              </button>
-            </div>
-
-            {aberto && (
-              <div
-                className="table-wrap"
-                style={{ marginTop: 15 }}
-              >
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Jogo</th>
-                      <th>Fase</th>
-                      <th>Palpite</th>
-                      <th>Classificado</th>
-                      <th>Pontos</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {palpitesDoParticipante.map((p) => (
-                      <tr key={p.id}>
-                        <td>
-                          {p.timeCasaNome} x {p.timeVisitanteNome}
-                        </td>
-
-                        <td>
-                          {formatarFase(p.fase)}
-                        </td>
-
-                        <td>
-                          {p.golsCasaPalpite} x {p.golsVisitantePalpite}
-                        </td>
-
-                        <td>
-                          {p.classificadoPalpiteNome || '-'}
-                        </td>
-
-                        <td className="pontos-obtidos">
-                          {p.pontosObtidos}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+              Ver palpites enviados
+            </button>
           </div>
-        )
-      })}
-  </>
-)}
-</div>
+
+          {!ehAdmin && !palpitesJaEnviados && (
+            <div className="empty">
+              <div className="empty-icon">🔒</div>
+              <p>Você só poderá ver os palpites dos outros participantes depois de enviar os seus.</p>
+            </div>
+          )}
+
+          {palpitesParticipantes.length > 0 && (
+            <div className="grupos-wrap">
+              {Object.entries(jogosPorGrupo).map(([grupo, jogosDoGrupo]) => {
+                const jogosComPalpite = jogosDoGrupo.filter(
+                  (j) => (palpitesPorJogo[j.id] || []).length > 0
+                )
+                if (jogosComPalpite.length === 0) return null
+
+                const finalizados = jogosComPalpite.filter((j) => j.finalizado).length
+
+                return (
+                  <div className="grupo-card" key={grupo} style={{ marginBottom: 16 }}>
+                    <div className="grupo-header">
+                      <span>{grupo === 'MATA-MATA' ? 'Mata-mata' : `Grupo ${grupo}`}</span>
+                      <small>{jogosComPalpite.length} jogos · {finalizados} finalizados</small>
+                    </div>
+
+                    <div>
+                      {jogosComPalpite.map((jogo) => {
+                        const palpitesDoJogo = ordenarPalpites(palpitesPorJogo[jogo.id] || [])
+                        const aberto = jogoAberto === jogo.id
+                        const st = jogo.finalizado ? statsJogo(palpitesDoJogo) : null
+
+                        return (
+                          <div className={`pp-jogo ${aberto ? 'aberto' : ''}`} key={jogo.id}>
+                            <div
+                              className="pp-jogo-head"
+                              onClick={() => setJogoAberto(aberto ? '' : jogo.id)}
+                            >
+                              <div>
+                                <div className="pp-confronto">
+                                  {jogo.timeCasaNome}
+                                  {jogo.finalizado ? (
+                                    <span className="pp-placar">{jogo.golsCasa} × {jogo.golsVisitante}</span>
+                                  ) : (
+                                    <span className="pp-placar"> × </span>
+                                  )}
+                                  {jogo.timeVisitanteNome}
+                                </div>
+                                <div className="pp-meta">
+                                  {ehMataMata(jogo) ? formatarFase(jogo.fase) : `Grupo ${grupo}`} · {formatarData(jogo.dataHora)}
+                                </div>
+                                {jogo.finalizado ? (
+                                  <div className="pp-stats">
+                                    🎯 <b>{st.exato}</b> placar exato · ✅ <b>{st.resultado}</b> acertaram o resultado
+                                    {st.melhor && (
+                                      <> · 🏅 melhor: <b>{st.melhor.nomeUsuario}</b> ({st.melhor.pontosObtidos} pts)</>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="pp-stats">Jogo ainda não finalizado — {palpitesDoJogo.length} palpites</div>
+                                )}
+                              </div>
+
+                              <div className="pp-right">
+                                <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
+                                  {jogo.finalizado ? '✓ Finalizado' : '⏳ Pendente'}
+                                </span>
+                                <span className="pp-chev">▼</span>
+                              </div>
+                            </div>
+
+                            {aberto && (
+                              <div className="pp-body">
+                                <div className="table-wrap">
+                                  <table>
+                                    <thead>
+                                      <tr>
+                                        <th>#</th>
+                                        <th>Participante</th>
+                                        <th>Palpite</th>
+                                        {ehMataMata(jogo) && <th>Classificado</th>}
+                                        <th>Acerto</th>
+                                        <th>Pontos</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {palpitesDoJogo.map((p, i) => (
+                                        <tr key={p.id}>
+                                          <td>{jogo.finalizado ? i + 1 : '—'}</td>
+                                          <td>{p.nomeUsuario}</td>
+                                          <td className="pp-pal">{p.golsCasaPalpite} × {p.golsVisitantePalpite}</td>
+                                          {ehMataMata(jogo) && <td>{p.classificadoPalpiteNome || '-'}</td>}
+                                          <td className="pp-acerto">
+                                            {jogo.finalizado ? acertoLabel(jogo, p) : 'aguardando'}
+                                          </td>
+                                          <td>
+                                            {jogo.finalizado ? (
+                                              <span className={chipClass(p.pontosObtidos ?? 0)}>{p.pontosObtidos ?? 0}</span>
+                                            ) : (
+                                              '—'
+                                            )}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="card">
           <div className="card-title">
