@@ -606,6 +606,25 @@ select:focus {
   flex-direction: column;
 }
 
+.grupo-header-btn {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.grupo-header-btn:hover {
+  filter: brightness(1.05);
+}
+
+.grupo-chevron {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--amarelo);
+}
+
 .jogo-card {
   display: grid;
   grid-template-columns: 1fr 110px 170px 90px;
