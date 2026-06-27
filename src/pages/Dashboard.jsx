@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import '../App.css'
@@ -20,6 +20,7 @@ function Dashboard() {
   const [palpitesParticipantes, setPalpitesParticipantes] = useState([])
   const [jogoAberto, setJogoAberto] = useState('')
   const [secoesAbertas, setSecoesAbertas] = useState({})
+  const [secoesPalpitesAbertas, setSecoesPalpitesAbertas] = useState({})
 
   const navigate = useNavigate()
 
@@ -113,7 +114,7 @@ function Dashboard() {
         ...mapeados,
       }))
     } catch {
-      setErro('Erro ao carregar palpites do bolão')
+      setErro('Erro ao carregar palpites do bolÃ£o')
     }
   }
 
@@ -161,7 +162,7 @@ function Dashboard() {
     setMensagem('')
 
     if (!nomeNovoBolao.trim()) {
-      setErro('Informe o nome do bolão.')
+      setErro('Informe o nome do bolÃ£o.')
       return
     }
 
@@ -171,12 +172,12 @@ function Dashboard() {
         organizadorId: usuario.id,
       })
 
-      setMensagem(`Bolão criado com sucesso! Código do convite: ${response.data.codigoConvite}`)
+      setMensagem(`BolÃ£o criado com sucesso! CÃ³digo do convite: ${response.data.codigoConvite}`)
       setNomeNovoBolao('')
       await carregarDados()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
-      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao criar bolão.')
+      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao criar bolÃ£o.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -187,7 +188,7 @@ function Dashboard() {
     setMensagem('')
 
     if (!codigoConvite.trim()) {
-      setErro('Informe o código do convite')
+      setErro('Informe o cÃ³digo do convite')
       return
     }
 
@@ -197,12 +198,12 @@ function Dashboard() {
         codigoConvite: codigoConvite.trim(),
       })
 
-      setMensagem('Você entrou no bolão com sucesso! 🎉')
+      setMensagem('VocÃª entrou no bolÃ£o com sucesso! ðŸŽ‰')
       setCodigoConvite('')
       await carregarDados()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
-      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao entrar no bolão.')
+      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao entrar no bolÃ£o.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -212,7 +213,7 @@ function Dashboard() {
     setMensagem('')
 
     if (!bolaoSelecionadoId) {
-      setErro('Selecione um bolão antes de palpitar.')
+      setErro('Selecione um bolÃ£o antes de palpitar.')
       return
     }
 
@@ -225,7 +226,7 @@ function Dashboard() {
     }
 
     if (ehMataMata(jogo) && !palpite.classificadoPalpiteId) {
-      setErro('Em jogo de mata-mata, informe quem você acha que vai se classificar.')
+      setErro('Em jogo de mata-mata, informe quem vocÃª acha que vai se classificar.')
       return
     }
 
@@ -248,7 +249,7 @@ function Dashboard() {
         await api.post('/palpites', dadosPalpite)
       }
 
-      setMensagem('Palpite salvo com sucesso! ✅')
+      setMensagem('Palpite salvo com sucesso! âœ…')
       await carregarPalpitesDoBolao(participanteBolaoId)
       await carregarRankingDoBolaoSelecionado(participanteBolaoId)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -325,15 +326,15 @@ function Dashboard() {
     setMensagem('')
 
     if (!bolaoSelecionadoId) {
-      setErro('Selecione um bolão antes de enviar os palpites.')
+      setErro('Selecione um bolÃ£o antes de enviar os palpites.')
       return
     }
 
-    if (!window.confirm('Tem certeza que deseja enviar seus palpites? Depois do envio, eles ficarão bloqueados.')) return
+    if (!window.confirm('Tem certeza que deseja enviar seus palpites? Depois do envio, eles ficarÃ£o bloqueados.')) return
 
     try {
       await api.put(`/palpites/enviar/${bolaoSelecionadoId}`)
-      setMensagem('Palpites enviados com sucesso! Agora eles estão bloqueados.')
+      setMensagem('Palpites enviados com sucesso! Agora eles estÃ£o bloqueados.')
       await carregarDados()
       await carregarPalpitesDoBolao(bolaoSelecionadoId)
       await carregarRankingDoBolaoSelecionado(bolaoSelecionadoId)
@@ -440,15 +441,15 @@ function Dashboard() {
     setMensagem('')
 
     if (!codigo) {
-      setErro('Este bolão ainda não possui código de convite.')
+      setErro('Este bolÃ£o ainda nÃ£o possui cÃ³digo de convite.')
       return
     }
 
     try {
       await navigator.clipboard.writeText(codigo)
-      setMensagem(`Código ${codigo} copiado! Agora é só enviar para os participantes.`)
+      setMensagem(`CÃ³digo ${codigo} copiado! Agora Ã© sÃ³ enviar para os participantes.`)
     } catch {
-      setErro('Não foi possível copiar automaticamente. Selecione o código e copie manualmente.')
+      setErro('NÃ£o foi possÃ­vel copiar automaticamente. Selecione o cÃ³digo e copie manualmente.')
     }
   }
 
@@ -457,12 +458,12 @@ function Dashboard() {
   setMensagem('')
 
   if (!meuBolao) {
-    setErro('Selecione um bolão primeiro.')
+    setErro('Selecione um bolÃ£o primeiro.')
     return
   }
 
   if (!ehAdmin && !palpitesJaEnviados) {
-    setErro('Você só pode ver os palpites dos outros participantes depois de enviar os seus.')
+    setErro('VocÃª sÃ³ pode ver os palpites dos outros participantes depois de enviar os seus.')
     return
   }
 
@@ -501,7 +502,7 @@ function Dashboard() {
     if (fase === 'OITAVAS') return 'Oitavas'
     if (fase === 'QUARTAS') return 'Quartas'
     if (fase === 'SEMIFINAL') return 'Semifinal'
-    if (fase === 'TERCEIRO_LUGAR') return '3º lugar'
+    if (fase === 'TERCEIRO_LUGAR') return '3Âº lugar'
     if (fase === 'FINAL') return 'Final'
     return fase
   }
@@ -571,6 +572,21 @@ function Dashboard() {
     }))
   }
 
+  function secaoPalpitesEstaAberta(secao) {
+    if (secoesPalpitesAbertas[secao.chave] !== undefined) {
+      return secoesPalpitesAbertas[secao.chave]
+    }
+
+    return secao.jogos.some((jogo) => !jogo.finalizado)
+  }
+
+  function alternarSecaoPalpites(chave, abertaAtual) {
+    setSecoesPalpitesAbertas((atual) => ({
+      ...atual,
+      [chave]: !abertaAtual,
+    }))
+  }
+
   function rankClass(pos) {
     if (pos === 1) return 'rank-pos ouro'
     if (pos === 2) return 'rank-pos prata'
@@ -590,7 +606,7 @@ function Dashboard() {
     const exato =
       palpite.golsCasaPalpite === jogo.golsCasa &&
       palpite.golsVisitantePalpite === jogo.golsVisitante
-    if (exato) return '🎯 Placar exato'
+    if (exato) return 'ðŸŽ¯ Placar exato'
 
     const sinal = (a, b) => Math.sign(a - b)
     const acertouResultado =
@@ -601,9 +617,9 @@ function Dashboard() {
       palpite.golsVisitantePalpite === jogo.golsVisitante
 
     const partes = []
-    if (acertouResultado) partes.push('✅ Resultado')
-    if (acertouGol) partes.push('🟡 Gol exato')
-    return partes.join(' + ') || '—'
+    if (acertouResultado) partes.push('âœ… Resultado')
+    if (acertouGol) partes.push('ðŸŸ¡ Gol exato')
+    return partes.join(' + ') || 'â€”'
   }
 
   function statsJogo(palpitesDoJogo) {
@@ -642,27 +658,27 @@ function Dashboard() {
     <div className="page-wrap">
       <div className="topbar">
         <div className="topbar-brand">
-          ⚽ BOLÃO <span>Copa 2026</span>
+          âš½ BOLÃƒO <span>Copa 2026</span>
         </div>
         <div className="topbar-user">
-          {usuario && <span>👤 {usuario.nome}</span>}
+          {usuario && <span>ðŸ‘¤ {usuario.nome}</span>}
           <button className="btn btn-danger btn-sm" onClick={sair}>Sair</button>
         </div>
       </div>
 
       <div className="container">
-        {erro && <div className="alerta alerta-erro">⚠️ {erro}</div>}
-        {mensagem && <div className="alerta alerta-ok">✅ {mensagem}</div>}
+        {erro && <div className="alerta alerta-erro">âš ï¸ {erro}</div>}
+        {mensagem && <div className="alerta alerta-ok">âœ… {mensagem}</div>}
 
         <div className="hero">
           <div>
             <div className="hero-title">COPA DO MUNDO 2026</div>
-            <div className="hero-sub">🇺🇸 EUA &nbsp;·&nbsp; 🇨🇦 Canadá &nbsp;·&nbsp; 🇲🇽 México</div>
+            <div className="hero-sub">ðŸ‡ºðŸ‡¸ EUA &nbsp;Â·&nbsp; ðŸ‡¨ðŸ‡¦ CanadÃ¡ &nbsp;Â·&nbsp; ðŸ‡²ðŸ‡½ MÃ©xico</div>
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
               <div className="hero-stat-num">{boloes.length}</div>
-              <div className="hero-stat-label">{ehAdmin ? 'Bolões' : 'Meus bolões'}</div>
+              <div className="hero-stat-label">{ehAdmin ? 'BolÃµes' : 'Meus bolÃµes'}</div>
             </div>
             <div className="hero-stat">
               <div className="hero-stat-num">{jogos.length}</div>
@@ -680,14 +696,14 @@ function Dashboard() {
         <div className="grid-2">
           {usuario && (
             <div className="card">
-              <div className="card-title">👤 Meu Perfil</div>
+              <div className="card-title">ðŸ‘¤ Meu Perfil</div>
               <div className="perfil-info">
                 <div className="perfil-row"><strong>Nome</strong> {usuario.nome}</div>
                 <div className="perfil-row"><strong>E-mail</strong> {usuario.email}</div>
                 <div className="perfil-row">
                   <strong>Perfil</strong>
                   <span className={`badge ${ehAdmin ? 'badge-admin' : 'badge-user'}`}>
-                    {ehAdmin ? '🛡 Administrador' : '⚽ Participante'}
+                    {ehAdmin ? 'ðŸ›¡ Administrador' : 'âš½ Participante'}
                   </span>
                 </div>
               </div>
@@ -696,13 +712,13 @@ function Dashboard() {
 
           {!ehAdmin && (
             <div className="card">
-              <div className="card-title">🎟 Entrar em um Bolão</div>
+              <div className="card-title">ðŸŽŸ Entrar em um BolÃ£o</div>
               <form onSubmit={entrarNoBolao} className="convite-form">
                 <input
                   type="text"
                   value={codigoConvite}
                   onChange={(e) => setCodigoConvite(e.target.value)}
-                  placeholder="Cole o código do convite"
+                  placeholder="Cole o cÃ³digo do convite"
                   style={{ flex: 1 }}
                 />
                 <button type="submit" className="btn btn-primary">Entrar</button>
@@ -712,16 +728,16 @@ function Dashboard() {
 
           {ehAdmin && (
             <div className="card">
-              <div className="card-title">🛠 Criar Bolão</div>
+              <div className="card-title">ðŸ›  Criar BolÃ£o</div>
               <form onSubmit={criarBolao} className="convite-form">
                 <input
                   type="text"
                   value={nomeNovoBolao}
                   onChange={(e) => setNomeNovoBolao(e.target.value)}
-                  placeholder="Nome do bolão. Ex: Bolão Família Copa 2026"
+                  placeholder="Nome do bolÃ£o. Ex: BolÃ£o FamÃ­lia Copa 2026"
                   style={{ flex: 1 }}
                 />
-                <button type="submit" className="btn btn-primary">Criar Bolão</button>
+                <button type="submit" className="btn btn-primary">Criar BolÃ£o</button>
               </form>
             </div>
           )}
@@ -729,13 +745,13 @@ function Dashboard() {
 
         {ehAdmin && (
           <div className="card" style={{ marginBottom: 20 }}>
-            <div className="card-title">🧩 Administração do Mata-Mata</div>
+            <div className="card-title">ðŸ§© AdministraÃ§Ã£o do Mata-Mata</div>
             <div className="selector-wrap">
               <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-dezesseis-avos', '16 avos')}>Gerar 16 avos</button>
               <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-oitavas', 'oitavas')}>Gerar oitavas</button>
               <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-quartas', 'quartas')}>Gerar quartas</button>
               <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-semifinal', 'semifinal')}>Gerar semifinal</button>
-              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-terceiro-lugar', 'terceiro lugar')}>Gerar 3º lugar</button>
+              <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-terceiro-lugar', 'terceiro lugar')}>Gerar 3Âº lugar</button>
               <button className="btn btn-primary btn-sm" onClick={() => gerarFase('gerar-final', 'final')}>Gerar final</button>
             </div>
           </div>
@@ -743,16 +759,16 @@ function Dashboard() {
 
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-title">
-            {ehAdmin ? '🏆 Administração de Bolões' : '🏆 Meus Bolões'}
+            {ehAdmin ? 'ðŸ† AdministraÃ§Ã£o de BolÃµes' : 'ðŸ† Meus BolÃµes'}
           </div>
 
           {boloes.length === 0 ? (
             <div className="empty">
-              <div className="empty-icon">⚽</div>
+              <div className="empty-icon">âš½</div>
               <p>
                 {ehAdmin
-                  ? 'Nenhum bolão cadastrado ainda.'
-                  : 'Você ainda não participa de nenhum bolão. Use o código de convite acima!'}
+                  ? 'Nenhum bolÃ£o cadastrado ainda.'
+                  : 'VocÃª ainda nÃ£o participa de nenhum bolÃ£o. Use o cÃ³digo de convite acima!'}
               </p>
             </div>
           ) : (
@@ -760,12 +776,12 @@ function Dashboard() {
               <table>
                 <thead>
                   <tr>
-                    <th>Bolão</th>
-                    <th>Código</th>
+                    <th>BolÃ£o</th>
+                    <th>CÃ³digo</th>
                     <th>Participantes</th>
                     <th>Pontos</th>
                     <th>Palpites</th>
-                    <th>Ação</th>
+                    <th>AÃ§Ã£o</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -783,7 +799,7 @@ function Dashboard() {
                       <td style={{ fontWeight: 700, color: 'var(--verde-escuro)' }}>{bolao.pontos}</td>
                       <td>
                         <span className={`tag ${bolao.palpitesEnviados ? 'tag-ok' : 'tag-pend'}`}>
-                          {bolao.palpitesEnviados ? '✓ Enviados' : '⏳ Pendentes'}
+                          {bolao.palpitesEnviados ? 'âœ“ Enviados' : 'â³ Pendentes'}
                         </span>
                       </td>
                       <td>
@@ -792,7 +808,7 @@ function Dashboard() {
                           className="btn btn-primary btn-sm"
                           onClick={() => copiarCodigoConvite(bolao.codigoConvite)}
                         >
-                          Copiar código
+                          Copiar cÃ³digo
                         </button>
                       </td>
                     </tr>
@@ -805,13 +821,13 @@ function Dashboard() {
 
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-title">
-            {ehAdmin ? '📊 Ranking e Participantes' : '📊 Ranking do Bolão'}
+            {ehAdmin ? 'ðŸ“Š Ranking e Participantes' : 'ðŸ“Š Ranking do BolÃ£o'}
           </div>
 
           <div className="selector-wrap" style={{ marginBottom: 18 }}>
-            <label>Bolão selecionado:</label>
+            <label>BolÃ£o selecionado:</label>
             <select value={bolaoSelecionadoId} onChange={(e) => setBolaoSelecionadoId(e.target.value)}>
-              <option value="">— Selecione —</option>
+              <option value="">â€” Selecione â€”</option>
               {boloes.map((b) => (
                 <option key={b.id} value={b.id}>{b.nomeBolao}</option>
               ))}
@@ -843,7 +859,7 @@ function Dashboard() {
 
           {ranking.length === 0 ? (
             <div className="empty">
-              <div className="empty-icon">📋</div>
+              <div className="empty-icon">ðŸ“‹</div>
               <p>Nenhum participante no ranking ainda.</p>
             </div>
           ) : (
@@ -861,7 +877,7 @@ function Dashboard() {
                     <tr key={item.participanteBolaoId}>
                       <td>
                         <span className={rankClass(item.posicao)}>
-                          {item.posicao === 1 ? '🥇' : item.posicao === 2 ? '🥈' : item.posicao === 3 ? '🥉' : `${item.posicao}º`}
+                          {item.posicao === 1 ? 'ðŸ¥‡' : item.posicao === 2 ? 'ðŸ¥ˆ' : item.posicao === 3 ? 'ðŸ¥‰' : `${item.posicao}Âº`}
                         </span>
                       </td>
                       <td>{item.nomeUsuario}</td>
@@ -874,7 +890,7 @@ function Dashboard() {
           )}
         </div>
         <div className="card" style={{ marginBottom: 20 }}>
-          <div className="card-title">👀 Palpites dos Participantes</div>
+          <div className="card-title">ðŸ‘€ Palpites dos Participantes</div>
 
           <div style={{ marginBottom: 15 }}>
             <button
@@ -889,115 +905,128 @@ function Dashboard() {
 
           {!ehAdmin && !palpitesJaEnviados && (
             <div className="empty">
-              <div className="empty-icon">🔒</div>
-              <p>Você só poderá ver os palpites dos outros participantes depois de enviar os seus.</p>
+              <div className="empty-icon">ðŸ”’</div>
+              <p>VocÃª sÃ³ poderÃ¡ ver os palpites dos outros participantes depois de enviar os seus.</p>
             </div>
           )}
 
           {palpitesParticipantes.length > 0 && (
             <div className="grupos-wrap">
-              {Object.entries(jogosPorGrupo).map(([grupo, jogosDoGrupo]) => {
-                const jogosComPalpite = jogosDoGrupo.filter(
+              {montarSecoesJogos(jogosPorGrupo).map((secao) => {
+                const jogosComPalpite = secao.jogos.filter(
                   (j) => (palpitesPorJogo[j.id] || []).length > 0
                 )
                 if (jogosComPalpite.length === 0) return null
 
+                const secaoComPalpites = {
+                  ...secao,
+                  chave: `PALPITES-${secao.chave}`,
+                  jogos: jogosComPalpite,
+                }
+                const aberta = secaoPalpitesEstaAberta(secaoComPalpites)
                 const finalizados = jogosComPalpite.filter((j) => j.finalizado).length
 
                 return (
-                  <div className="grupo-card" key={grupo} style={{ marginBottom: 16 }}>
-                    <div className="grupo-header">
-                      <span>{grupo === 'MATA-MATA' ? 'Mata-mata' : `Grupo ${grupo}`}</span>
+                  <div className="grupo-card" key={secaoComPalpites.chave} style={{ marginBottom: 16 }}>
+                    <button
+                      type="button"
+                      className="grupo-header grupo-header-btn"
+                      onClick={() => alternarSecaoPalpites(secaoComPalpites.chave, aberta)}
+                    >
+                      <span>{secao.titulo}</span>
                       <small>{jogosComPalpite.length} jogos · {finalizados} finalizados</small>
-                    </div>
+                      <span className="grupo-chevron">{aberta ? '▲' : '▼'}</span>
+                    </button>
 
-                    <div>
-                      {jogosComPalpite.map((jogo) => {
-                        const palpitesDoJogo = ordenarPalpites(palpitesPorJogo[jogo.id] || [])
-                        const aberto = jogoAberto === jogo.id
-                        const st = jogo.finalizado ? statsJogo(palpitesDoJogo) : null
+                    {aberta && (
+                      <div className="grupo-jogos">
+                        {jogosComPalpite.map((jogo) => {
+                          const palpitesDoJogo = ordenarPalpites(palpitesPorJogo[jogo.id] || [])
+                          const aberto = jogoAberto === jogo.id
+                          const st = jogo.finalizado ? statsJogo(palpitesDoJogo) : null
 
-                        return (
-                          <div className={`pp-jogo ${aberto ? 'aberto' : ''}`} key={jogo.id}>
-                            <div
-                              className="pp-jogo-head"
-                              onClick={() => setJogoAberto(aberto ? '' : jogo.id)}
-                            >
-                              <div>
-                                <div className="pp-confronto">
-                                  {jogo.timeCasaNome}
-                                  {jogo.finalizado ? (
-                                    <span className="pp-placar">{jogo.golsCasa} × {jogo.golsVisitante}</span>
-                                  ) : (
-                                    <span className="pp-placar"> × </span>
-                                  )}
-                                  {jogo.timeVisitanteNome}
-                                </div>
-                                <div className="pp-meta">
-                                  {ehMataMata(jogo) ? formatarFase(jogo.fase) : `Grupo ${grupo}`} · {formatarData(jogo.dataHora)}
-                                </div>
-                                {jogo.finalizado ? (
-                                  <div className="pp-stats">
-                                    🎯 <b>{st.exato}</b> placar exato · ✅ <b>{st.resultado}</b> acertaram o resultado
-                                    {st.melhor && (
-                                      <> · 🏅 melhor: <b>{st.melhor.nomeUsuario}</b> ({st.melhor.pontosObtidos} pts)</>
+                          return (
+                            <div className={`pp-jogo ${aberto ? 'aberto' : ''}`} key={jogo.id}>
+                              <div
+                                className="pp-jogo-head"
+                                onClick={() => setJogoAberto(aberto ? '' : jogo.id)}
+                              >
+                                <div>
+                                  <div className="pp-confronto">
+                                    {jogo.timeCasaNome}
+                                    {jogo.finalizado ? (
+                                      <span className="pp-placar">{jogo.golsCasa} × {jogo.golsVisitante}</span>
+                                    ) : (
+                                      <span className="pp-placar"> × </span>
                                     )}
+                                    {jogo.timeVisitanteNome}
                                   </div>
-                                ) : (
-                                  <div className="pp-stats">Jogo ainda não finalizado — {palpitesDoJogo.length} palpites</div>
-                                )}
-                              </div>
+                                  <div className="pp-meta">
+                                    {ehMataMata(jogo) ? formatarFase(jogo.fase) : secao.titulo} · {formatarData(jogo.dataHora)}
+                                  </div>
+                                  {jogo.finalizado ? (
+                                    <div className="pp-stats">
+                                      🎯 <b>{st.exato}</b> placar exato · ✅ <b>{st.resultado}</b> acertaram o resultado
+                                      {st.melhor && (
+                                        <> · 🏅 melhor: <b>{st.melhor.nomeUsuario}</b> ({st.melhor.pontosObtidos} pts)</>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="pp-stats">Jogo ainda não finalizado — {palpitesDoJogo.length} palpites</div>
+                                  )}
+                                </div>
 
-                              <div className="pp-right">
-                                <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
-                                  {jogo.finalizado ? '✓ Finalizado' : '⏳ Pendente'}
-                                </span>
-                                <span className="pp-chev">▼</span>
-                              </div>
-                            </div>
-
-                            {aberto && (
-                              <div className="pp-body">
-                                <div className="table-wrap">
-                                  <table>
-                                    <thead>
-                                      <tr>
-                                        <th>#</th>
-                                        <th>Participante</th>
-                                        <th>Palpite</th>
-                                        {ehMataMata(jogo) && <th>Classificado</th>}
-                                        <th>Acerto</th>
-                                        <th>Pontos</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {palpitesDoJogo.map((p, i) => (
-                                        <tr key={p.id}>
-                                          <td>{jogo.finalizado ? i + 1 : '—'}</td>
-                                          <td>{p.nomeUsuario}</td>
-                                          <td className="pp-pal">{p.golsCasaPalpite} × {p.golsVisitantePalpite}</td>
-                                          {ehMataMata(jogo) && <td>{p.classificadoPalpiteNome || '-'}</td>}
-                                          <td className="pp-acerto">
-                                            {jogo.finalizado ? acertoLabel(jogo, p) : 'aguardando'}
-                                          </td>
-                                          <td>
-                                            {jogo.finalizado ? (
-                                              <span className={chipClass(p.pontosObtidos ?? 0)}>{p.pontosObtidos ?? 0}</span>
-                                            ) : (
-                                              '—'
-                                            )}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
+                                <div className="pp-right">
+                                  <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
+                                    {jogo.finalizado ? '✓ Finalizado' : '⏳ Pendente'}
+                                  </span>
+                                  <span className="pp-chev">▼</span>
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
+
+                              {aberto && (
+                                <div className="pp-body">
+                                  <div className="table-wrap">
+                                    <table>
+                                      <thead>
+                                        <tr>
+                                          <th>#</th>
+                                          <th>Participante</th>
+                                          <th>Palpite</th>
+                                          {ehMataMata(jogo) && <th>Classificado</th>}
+                                          <th>Acerto</th>
+                                          <th>Pontos</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {palpitesDoJogo.map((p, i) => (
+                                          <tr key={p.id}>
+                                            <td>{jogo.finalizado ? i + 1 : '—'}</td>
+                                            <td>{p.nomeUsuario}</td>
+                                            <td className="pp-pal">{p.golsCasaPalpite} × {p.golsVisitantePalpite}</td>
+                                            {ehMataMata(jogo) && <td>{p.classificadoPalpiteNome || '-'}</td>}
+                                            <td className="pp-acerto">
+                                              {jogo.finalizado ? acertoLabel(jogo, p) : 'aguardando'}
+                                            </td>
+                                            <td>
+                                              {jogo.finalizado ? (
+                                                <span className={chipClass(p.pontosObtidos ?? 0)}>{p.pontosObtidos ?? 0}</span>
+                                              ) : (
+                                                '—'
+                                              )}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -1007,12 +1036,12 @@ function Dashboard() {
 
         <div className="card">
           <div className="card-title">
-            {ehAdmin ? '⚽ Administração de Jogos e Resultados' : '⚽ Meus Palpites'}
+            {ehAdmin ? 'âš½ AdministraÃ§Ã£o de Jogos e Resultados' : 'âš½ Meus Palpites'}
           </div>
 
           {jogos.length === 0 ? (
             <div className="empty">
-              <div className="empty-icon">📅</div>
+              <div className="empty-icon">ðŸ“…</div>
               <p>Nenhum jogo cadastrado ainda.</p>
             </div>
           ) : (
@@ -1029,8 +1058,8 @@ function Dashboard() {
                     onClick={() => alternarSecao(secao.chave, aberta)}
                   >
                     <span>{secao.titulo}</span>
-                    <small>{secao.jogos.length} jogos · {finalizados} finalizados</small>
-                    <span className="grupo-chevron">{aberta ? '▲' : '▼'}</span>
+                    <small>{secao.jogos.length} jogos Â· {finalizados} finalizados</small>
+                    <span className="grupo-chevron">{aberta ? 'â–²' : 'â–¼'}</span>
                   </button>
 
                   {aberta && (
@@ -1049,7 +1078,7 @@ function Dashboard() {
                               <span>{jogo.timeCasaNome}</span>
                             </div>
 
-                            <div className="versus">×</div>
+                            <div className="versus">Ã—</div>
 
                             <div className="time time-visitante">
                               <img src={jogo.timeVisitanteBandeiraUrl} alt={jogo.timeVisitanteNome} className="bandeira" />
@@ -1060,7 +1089,7 @@ function Dashboard() {
                           <div className="jogo-meta">
                             <span>{jogo.estadioNome}</span>
                             <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
-                              {jogo.finalizado ? '✓ Finalizado' : '⏳ Pendente'}
+                              {jogo.finalizado ? 'âœ“ Finalizado' : 'â³ Pendente'}
                             </span>
                           </div>
                         </div>
@@ -1069,13 +1098,13 @@ function Dashboard() {
                           <div className="label-mini">Resultado</div>
                           {jogo.golsCasa !== null && jogo.golsVisitante !== null ? (
                             <>
-                              <span className="resultado">{jogo.golsCasa} × {jogo.golsVisitante}</span>
+                              <span className="resultado">{jogo.golsCasa} Ã— {jogo.golsVisitante}</span>
                               {jogo.penaltisCasa !== null && jogo.penaltisVisitante !== null && (
-                                <div className="penaltis-mini">Pên: {jogo.penaltisCasa} × {jogo.penaltisVisitante}</div>
+                                <div className="penaltis-mini">PÃªn: {jogo.penaltisCasa} Ã— {jogo.penaltisVisitante}</div>
                               )}
                             </>
                           ) : (
-                            <span>—</span>
+                            <span>â€”</span>
                           )}
                         </div>
 
@@ -1091,7 +1120,7 @@ function Dashboard() {
                                 onChange={(e) => atualizarPalpite(jogo.id, 'golsCasa', e.target.value)}
                                 disabled={jogo.finalizado || (palpitesJaEnviados && !ehMataMata(jogo))}
                               />
-                              <span className="palpite-vs">×</span>
+                              <span className="palpite-vs">Ã—</span>
                               <input
                                 type="number"
                                 min="0"
@@ -1117,7 +1146,7 @@ function Dashboard() {
                             )}
 
                             <div className="pontos-mini">
-                              Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : '—'}
+                              Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : 'â€”'}
                             </div>
                           </div>
                         )}
@@ -1143,7 +1172,7 @@ function Dashboard() {
                                   value={resultadosAdmin[jogo.id]?.golsCasa ?? ''}
                                   onChange={(e) => atualizarResultadoAdmin(jogo.id, 'golsCasa', e.target.value)}
                                 />
-                                <span className="palpite-vs">×</span>
+                                <span className="palpite-vs">Ã—</span>
                                 <input
                                   type="number"
                                   min="0"
@@ -1158,15 +1187,15 @@ function Dashboard() {
                                   <input
                                     type="number"
                                     min="0"
-                                    placeholder="Pên C"
+                                    placeholder="PÃªn C"
                                     value={resultadosAdmin[jogo.id]?.penaltisCasa ?? ''}
                                     onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisCasa', e.target.value)}
                                   />
-                                  <span className="palpite-vs">×</span>
+                                  <span className="palpite-vs">Ã—</span>
                                   <input
                                     type="number"
                                     min="0"
-                                    placeholder="Pên V"
+                                    placeholder="PÃªn V"
                                     value={resultadosAdmin[jogo.id]?.penaltisVisitante ?? ''}
                                     onChange={(e) => atualizarResultadoAdmin(jogo.id, 'penaltisVisitante', e.target.value)}
                                   />
