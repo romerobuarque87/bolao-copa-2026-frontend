@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import '../App.css'
@@ -177,7 +177,7 @@ function Dashboard() {
       await carregarDados()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
-      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao criar bol?o.')
+      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao criar bolão.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -203,7 +203,7 @@ function Dashboard() {
       await carregarDados()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
-      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao entrar no bol?o.')
+      setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao entrar no bolão.')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
@@ -330,7 +330,7 @@ function Dashboard() {
       return
     }
 
-    if (!window.confirm('Tem certeza que deseja enviar seus palpites? Depois do envio, eles ficar?o bloqueados.')) return
+    if (!window.confirm('Tem certeza que deseja enviar seus palpites? Depois do envio, eles ficarão bloqueados.')) return
 
     try {
       await api.put(`/palpites/enviar/${bolaoSelecionadoId}`)
@@ -678,7 +678,7 @@ function Dashboard() {
           <div className="hero-stats">
             <div className="hero-stat">
               <div className="hero-stat-num">{boloes.length}</div>
-              <div className="hero-stat-label">{ehAdmin ? 'Bol?es' : 'Meus bol?es'}</div>
+              <div className="hero-stat-label">{ehAdmin ? 'Bolões' : 'Meus bolões'}</div>
             </div>
             <div className="hero-stat">
               <div className="hero-stat-num">{jogos.length}</div>
@@ -703,7 +703,7 @@ function Dashboard() {
                 <div className="perfil-row">
                   <strong>Perfil</strong>
                   <span className={`badge ${ehAdmin ? 'badge-admin' : 'badge-user'}`}>
-                    {ehAdmin ? '?? Administrador' : '? Participante'}
+                    {ehAdmin ? 'Administrador' : 'Participante'}
                   </span>
                 </div>
               </div>
@@ -759,7 +759,7 @@ function Dashboard() {
 
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-title">
-            {ehAdmin ? '?? Administra??o de Bol?es' : '?? Meus Bol?es'}
+            {ehAdmin ? 'Administração de Bolões' : 'Meus Bolões'}
           </div>
 
           {boloes.length === 0 ? (
@@ -767,7 +767,7 @@ function Dashboard() {
               <div className="empty-icon">⚽</div>
               <p>
                 {ehAdmin
-                  ? 'Nenhum bol?o cadastrado ainda.'
+                  ? 'Nenhum bolão cadastrado ainda.'
                   : 'Você ainda não participa de nenhum bolão. Use o código de convite acima!'}
               </p>
             </div>
@@ -799,7 +799,7 @@ function Dashboard() {
                       <td style={{ fontWeight: 700, color: 'var(--verde-escuro)' }}>{bolao.pontos}</td>
                       <td>
                         <span className={`tag ${bolao.palpitesEnviados ? 'tag-ok' : 'tag-pend'}`}>
-                          {bolao.palpitesEnviados ? '? Enviados' : '? Pendentes'}
+                          {bolao.palpitesEnviados ? 'Enviados' : 'Pendentes'}
                         </span>
                       </td>
                       <td>
@@ -821,7 +821,7 @@ function Dashboard() {
 
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-title">
-            {ehAdmin ? '?? Ranking e Participantes' : '?? Ranking do Bol?o'}
+            {ehAdmin ? 'Ranking e Participantes' : 'Ranking do Bolão'}
           </div>
 
           <div className="selector-wrap" style={{ marginBottom: 18 }}>
@@ -877,7 +877,7 @@ function Dashboard() {
                     <tr key={item.participanteBolaoId}>
                       <td>
                         <span className={rankClass(item.posicao)}>
-                          {item.posicao === 1 ? '??' : item.posicao === 2 ? '??' : item.posicao === 3 ? '??' : `${item.posicao}?`}
+                          {item.posicao === 1 ? '\uD83E\uDD47' : item.posicao === 2 ? '\uD83E\uDD48' : item.posicao === 3 ? '\uD83E\uDD49' : `${item.posicao}\u00ba`}
                         </span>
                       </td>
                       <td>{item.nomeUsuario}</td>
@@ -935,7 +935,7 @@ function Dashboard() {
                     >
                       <span>{secao.titulo}</span>
                       <small>{jogosComPalpite.length} jogos · {finalizados} finalizados</small>
-                      <span className="grupo-chevron">{aberta ? '?' : '?'}</span>
+                      <span className="grupo-chevron">{aberta ? '▲' : '▼'}</span>
                     </button>
 
                     {aberta && (
@@ -962,7 +962,7 @@ function Dashboard() {
                                     {jogo.timeVisitanteNome}
                                   </div>
                                   <div className="pp-meta">
-                                    {ehMataMata(jogo) ? formatarFase(jogo.fase) : secao.titulo} ? {formatarData(jogo.dataHora)}
+                                    {ehMataMata(jogo) ? formatarFase(jogo.fase) : secao.titulo} · {formatarData(jogo.dataHora)}
                                   </div>
                                   {jogo.finalizado ? (
                                     <div className="pp-stats">
@@ -978,7 +978,7 @@ function Dashboard() {
 
                                 <div className="pp-right">
                                   <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
-                                    {jogo.finalizado ? '? Finalizado' : '? Pendente'}
+                                    {jogo.finalizado ? 'Finalizado' : 'Pendente'}
                                   </span>
                                   <span className="pp-chev">▼</span>
                                 </div>
@@ -1001,7 +1001,7 @@ function Dashboard() {
                                       <tbody>
                                         {palpitesDoJogo.map((p, i) => (
                                           <tr key={p.id}>
-                                            <td>{jogo.finalizado ? i + 1 : ''}</td>
+                                            <td>{jogo.finalizado ? i + 1 : '—'}</td>
                                             <td>{p.nomeUsuario}</td>
                                             <td className="pp-pal">{p.golsCasaPalpite} × {p.golsVisitantePalpite}</td>
                                             {ehMataMata(jogo) && <td>{p.classificadoPalpiteNome || '-'}</td>}
@@ -1036,7 +1036,7 @@ function Dashboard() {
 
         <div className="card">
           <div className="card-title">
-            {ehAdmin ? '? Administra??o de Jogos e Resultados' : '? Meus Palpites'}
+            {ehAdmin ? 'Administração de Jogos e Resultados' : 'Meus Palpites'}
           </div>
 
           {jogos.length === 0 ? (
@@ -1059,7 +1059,7 @@ function Dashboard() {
                   >
                     <span>{secao.titulo}</span>
                     <small>{secao.jogos.length} jogos · {finalizados} finalizados</small>
-                    <span className="grupo-chevron">{aberta ? '?' : '?'}</span>
+                    <span className="grupo-chevron">{aberta ? '▲' : '▼'}</span>
                   </button>
 
                   {aberta && (
@@ -1089,7 +1089,7 @@ function Dashboard() {
                           <div className="jogo-meta">
                             <span>{jogo.estadioNome}</span>
                             <span className={`tag ${jogo.finalizado ? 'tag-ok' : 'tag-pend'}`}>
-                              {jogo.finalizado ? '? Finalizado' : '? Pendente'}
+                              {jogo.finalizado ? 'Finalizado' : 'Pendente'}
                             </span>
                           </div>
                         </div>
@@ -1146,7 +1146,7 @@ function Dashboard() {
                             )}
 
                             <div className="pontos-mini">
-                              Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : '?'}
+                              Pts: {palpites[jogo.id]?.pontosObtidos !== undefined ? palpites[jogo.id].pontosObtidos : '—'}
                             </div>
                           </div>
                         )}
