@@ -524,6 +524,14 @@ function Dashboard() {
     return ordem[fase] || 99
   }
 
+    function ordenarJogosPorData(jogosLista) {
+    return [...jogosLista].sort((a, b) => {
+      const dataA = a.dataHora ? new Date(a.dataHora).getTime() : 0
+      const dataB = b.dataHora ? new Date(b.dataHora).getTime() : 0
+      return dataA - dataB
+    })
+  }
+
   function montarSecoesJogos(origem) {
     const secoes = []
 
@@ -532,7 +540,7 @@ function Dashboard() {
         secoes.push({
           chave: `GRUPO-${grupo}`,
           titulo: `Grupo ${grupo}`,
-          jogos: jogosDoGrupo,
+          jogos: ordenarJogosPorData(jogosDoGrupo),
         })
         return
       }
@@ -549,7 +557,7 @@ function Dashboard() {
           secoes.push({
             chave: `MATA-${fase}`,
             titulo: formatarFase(fase),
-            jogos: jogosDaFase,
+            jogos: ordenarJogosPorData(jogosDaFase),
           })
         })
     })
