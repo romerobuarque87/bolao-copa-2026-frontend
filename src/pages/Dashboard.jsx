@@ -516,16 +516,26 @@ function Dashboard() {
     return jogo.fase && jogo.fase !== 'GRUPOS'
   }
 
+  function dataHoraBrasilia(jogo) {
+    const valor = jogo.dataHora || jogo.data_hora
+
+    if (!valor) return null
+
+    const texto = String(valor)
+    const dataIso = texto.includes('T') ? texto : texto.replace(' ', 'T')
+
+    return new Date(`${dataIso}-03:00`)
+  }
+
   function jogoBloqueadoParaPalpite(jogo) {
     if (jogo.finalizado) {
       return true
     }
 
-    if (!jogo.dataHora) {
-      return false
-    }
+    const dataJogo = dataHoraBrasilia(jogo)
+    if (!dataJogo) return false
 
-    return new Date() >= new Date(jogo.dataHora)
+    return new Date() >= dataJogo
   }
 
   function placarPalpitePreenchido(palpite) {
@@ -605,6 +615,20 @@ function Dashboard() {
     return ordem[fase] || 99
   }
 
+  function ordenarJogosPorDataHora(lista) {
+    return [...(lista || [])].sort((a, b) => {
+      const dataA = dataHoraBrasilia(a)?.getTime() || 0
+      const dataB = dataHoraBrasilia(b)?.getTime() || 0
+
+      if (dataA !== dataB) return dataA - dataB
+
+      const ordemA = a.ordemMataMata || a.ordem_mata_mata || a.id || 0
+      const ordemB = b.ordemMataMata || b.ordem_mata_mata || b.id || 0
+
+      return ordemA - ordemB
+    })
+  }
+
   function montarSecoesJogos(origem) {
     const secoes = []
 
@@ -613,7 +637,7 @@ function Dashboard() {
         secoes.push({
           chave: `GRUPO-${grupo}`,
           titulo: `Grupo ${grupo}`,
-          jogos: jogosDoGrupo,
+          jogos: ordenarJogosPorDataHora(jogosDoGrupo),
         })
         return
       }
@@ -630,7 +654,7 @@ function Dashboard() {
           secoes.push({
             chave: `MATA-${fase}`,
             titulo: formatarFase(fase),
-            jogos: jogosDaFase,
+            jogos: ordenarJogosPorDataHora(jogosDaFase),
           })
         })
     })
