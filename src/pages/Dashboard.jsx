@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import '../App.css'
@@ -220,13 +220,20 @@ function Dashboard() {
     const participanteBolaoId = Number(bolaoSelecionadoId)
     const palpite = palpites[jogo.id]
 
+    if (jogoBloqueadoParaPalpite(jogo)) {
+      setErro('O prazo para palpitar neste jogo já foi encerrado.')
+      return
+    }
+
     if (!palpite || palpite.golsCasa === '' || palpite.golsVisitante === '' || palpite.golsCasa === undefined || palpite.golsVisitante === undefined) {
       setErro('Informe os dois placares do palpite.')
       return
     }
 
-    if (ehMataMata(jogo) && !palpite.classificadoPalpiteId) {
-      setErro('Em jogo de mata-mata, informe quem você acha que vai se classificar.')
+    const classificadoPalpiteId = descobrirClassificadoDoPalpite(jogo, palpite)
+
+    if (ehMataMata(jogo) && !classificadoPalpiteId) {
+      setErro('Em jogo de mata-mata empatado, informe quem você acha que vai se classificar.')
       return
     }
 
@@ -235,7 +242,7 @@ function Dashboard() {
       jogoId: jogo.id,
       golsCasaPalpite: Number(palpite.golsCasa),
       golsVisitantePalpite: Number(palpite.golsVisitante),
-      classificadoPalpiteId: ehMataMata(jogo) ? Number(palpite.classificadoPalpiteId) : null,
+      classificadoPalpiteId,
     }
 
     try {
@@ -252,10 +259,8 @@ function Dashboard() {
       setMensagem('Palpite salvo com sucesso! ✅')
       await carregarPalpitesDoBolao(participanteBolaoId)
       await carregarRankingDoBolaoSelecionado(participanteBolaoId)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       setErro(error.response?.data?.message || error.response?.data?.erro || error.response?.data || 'Erro ao salvar palpite.')
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -272,14 +277,14 @@ function Dashboard() {
 
     const jogosParaSalvar = jogos.filter((jogo) => {
       const palpite = palpites[jogo.id]
-      const permitidoEditar = !jogo.finalizado && (!palpitesJaEnviados || ehMataMata(jogo))
+      const permitidoEditar = !jogoBloqueadoParaPalpite(jogo) && (!palpitesJaEnviados || ehMataMata(jogo))
       const placarPreenchido =
         palpite &&
         palpite.golsCasa !== '' &&
         palpite.golsVisitante !== '' &&
         palpite.golsCasa !== undefined &&
         palpite.golsVisitante !== undefined
-      const classificadoOk = !ehMataMata(jogo) || Boolean(palpite?.classificadoPalpiteId)
+      const classificadoOk = !ehMataMata(jogo) || Boolean(descobrirClassificadoDoPalpite(jogo, palpite))
 
       return permitidoEditar && placarPreenchido && classificadoOk
     })
@@ -297,7 +302,7 @@ function Dashboard() {
           jogoId: jogo.id,
           golsCasaPalpite: Number(palpite.golsCasa),
           golsVisitantePalpite: Number(palpite.golsVisitante),
-          classificadoPalpiteId: ehMataMata(jogo) ? Number(palpite.classificadoPalpiteId) : null,
+          classificadoPalpiteId: descobrirClassificadoDoPalpite(jogo, palpite),
         }
 
         if (palpite.id) {
@@ -511,6 +516,82 @@ function Dashboard() {
     return jogo.fase && jogo.fase !== 'GRUPOS'
   }
 
+  function jogoBloqueadoParaPalpite(jogo) {
+    if (jogo.finalizado) {
+      return true
+    }
+
+    if (!jogo.dataHora) {
+      return false
+    }
+
+    return new Date() >= new Date(jogo.dataHora)
+  }
+
+  function placarPalpitePreenchido(palpite) {
+    return (
+      palpite &&
+      palpite.golsCasa !== '' &&
+      palpite.golsVisitante !== '' &&
+      palpite.golsCasa !== undefined &&
+      palpite.golsVisitante !== undefined
+    )
+  }
+
+  function palpiteMataMataEmpatado(jogo) {
+    const palpite = palpites[jogo.id]
+
+    if (!ehMataMata(jogo) || !placarPalpitePreenchido(palpite)) {
+      return false
+    }
+
+    return Number(palpite.golsCasa) === Number(palpite.golsVisitante)
+  }
+
+  function descobrirClassificadoDoPalpite(jogo, palpite) {
+    if (!ehMataMata(jogo)) {
+      return null
+    }
+
+    if (!placarPalpitePreenchido(palpite)) {
+      return null
+    }
+
+    const golsCasa = Number(palpite.golsCasa)
+    const golsVisitante = Number(palpite.golsVisitante)
+
+    if (golsCasa > golsVisitante) {
+      return Number(jogo.timeCasaId)
+    }
+
+    if (golsVisitante > golsCasa) {
+      return Number(jogo.timeVisitanteId)
+    }
+
+    return palpite.classificadoPalpiteId ? Number(palpite.classificadoPalpiteId) : null
+  }
+
+  function nomeClassificadoAutomatico(jogo) {
+    const palpite = palpites[jogo.id]
+
+    if (!ehMataMata(jogo) || !placarPalpitePreenchido(palpite)) {
+      return ''
+    }
+
+    const golsCasa = Number(palpite.golsCasa)
+    const golsVisitante = Number(palpite.golsVisitante)
+
+    if (golsCasa > golsVisitante) {
+      return jogo.timeCasaNome
+    }
+
+    if (golsVisitante > golsCasa) {
+      return jogo.timeVisitanteNome
+    }
+
+    return ''
+  }
+
   function ordemFase(fase) {
     const ordem = {
       DEZESSEIS_AVOS: 1,
@@ -524,14 +605,6 @@ function Dashboard() {
     return ordem[fase] || 99
   }
 
-    function ordenarJogosPorData(jogosLista) {
-    return [...jogosLista].sort((a, b) => {
-      const dataA = a.dataHora ? new Date(a.dataHora).getTime() : 0
-      const dataB = b.dataHora ? new Date(b.dataHora).getTime() : 0
-      return dataA - dataB
-    })
-  }
-
   function montarSecoesJogos(origem) {
     const secoes = []
 
@@ -540,7 +613,7 @@ function Dashboard() {
         secoes.push({
           chave: `GRUPO-${grupo}`,
           titulo: `Grupo ${grupo}`,
-          jogos: ordenarJogosPorData(jogosDoGrupo),
+          jogos: jogosDoGrupo,
         })
         return
       }
@@ -557,7 +630,7 @@ function Dashboard() {
           secoes.push({
             chave: `MATA-${fase}`,
             titulo: formatarFase(fase),
-            jogos: ordenarJogosPorData(jogosDaFase),
+            jogos: jogosDaFase,
           })
         })
     })
@@ -1126,7 +1199,7 @@ function Dashboard() {
                                 min="0"
                                 value={palpites[jogo.id]?.golsCasa ?? ''}
                                 onChange={(e) => atualizarPalpite(jogo.id, 'golsCasa', e.target.value)}
-                                disabled={jogo.finalizado || (palpitesJaEnviados && !ehMataMata(jogo))}
+                                disabled={jogoBloqueadoParaPalpite(jogo) || (palpitesJaEnviados && !ehMataMata(jogo))}
                               />
                               <span className="palpite-vs">×</span>
                               <input
@@ -1134,22 +1207,29 @@ function Dashboard() {
                                 min="0"
                                 value={palpites[jogo.id]?.golsVisitante ?? ''}
                                 onChange={(e) => atualizarPalpite(jogo.id, 'golsVisitante', e.target.value)}
-                                disabled={jogo.finalizado || (palpitesJaEnviados && !ehMataMata(jogo))}
+                                disabled={jogoBloqueadoParaPalpite(jogo) || (palpitesJaEnviados && !ehMataMata(jogo))}
                               />
                             </div>
 
-                            {ehMataMata(jogo) && (
+                            {ehMataMata(jogo) && palpiteMataMataEmpatado(jogo) && (
                               <div className="classificado-wrap">
                                 <label>Quem passa?</label>
                                 <select
                                   value={palpites[jogo.id]?.classificadoPalpiteId ?? ''}
                                   onChange={(e) => atualizarPalpite(jogo.id, 'classificadoPalpiteId', e.target.value)}
-                                  disabled={jogo.finalizado || (palpitesJaEnviados && !ehMataMata(jogo))}
+                                  disabled={jogoBloqueadoParaPalpite(jogo) || (palpitesJaEnviados && !ehMataMata(jogo))}
                                 >
                                   <option value="">Selecione</option>
                                   <option value={jogo.timeCasaId}>{jogo.timeCasaNome}</option>
                                   <option value={jogo.timeVisitanteId}>{jogo.timeVisitanteNome}</option>
                                 </select>
+                              </div>
+                            )}
+
+                            {ehMataMata(jogo) && nomeClassificadoAutomatico(jogo) && (
+                              <div className="classificado-wrap">
+                                <label>Classifica</label>
+                                <strong>{nomeClassificadoAutomatico(jogo)}</strong>
                               </div>
                             )}
 
@@ -1160,7 +1240,7 @@ function Dashboard() {
                         )}
 
                         <div className="jogo-acao">
-                          {!ehAdmin && !jogo.finalizado && (!palpitesJaEnviados || ehMataMata(jogo)) && (
+                          {!ehAdmin && !jogoBloqueadoParaPalpite(jogo) && (!palpitesJaEnviados || ehMataMata(jogo)) && (
                             <button className="btn btn-primary btn-sm" onClick={() => salvarPalpite(jogo)}>
                               {palpites[jogo.id]?.id ? 'Alterar' : 'Salvar'}
                             </button>
